@@ -1971,39 +1971,12 @@ function confetti(colors){
 }
 
 /* ══════════════════════════════════════
-   PWA — Service Worker + Install prompt
+   PWA — Service Worker
 ══════════════════════════════════════ */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW register failed:',err));
   });
-}
-
-/* Android/Chrome install banner */
-let deferredInstall=null;
-window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault();
-  deferredInstall=e;
-  showInstallHint();
-});
-
-function showInstallHint(){
-  if(document.getElementById('install-hint'))return;
-  const bar=document.createElement('div');
-  bar.id='install-hint';
-  bar.style.cssText='position:fixed;bottom:16px;left:16px;right:16px;z-index:500;background:#1B3A8C;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 24px rgba(27,58,140,.35);font-family:Inter,Kanit,sans-serif;font-size:.85rem;';
-  bar.innerHTML=`
-    <span>📲 ติดตั้งแอปไว้ที่หน้าจอ ใช้งานง่ายกว่า!</span>
-    <span style="display:flex;gap:8px;flex-shrink:0;">
-      <button id="install-yes" style="background:#fff;color:#1B3A8C;border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:.8rem;cursor:pointer;font-family:inherit;">ติดตั้ง</button>
-      <button id="install-no" style="background:transparent;color:rgba(255,255,255,.7);border:none;font-size:.8rem;cursor:pointer;font-family:inherit;">ไว้ก่อน</button>
-    </span>`;
-  document.body.appendChild(bar);
-  document.getElementById('install-yes').onclick=async()=>{
-    bar.remove();
-    if(deferredInstall){ deferredInstall.prompt(); deferredInstall=null; }
-  };
-  document.getElementById('install-no').onclick=()=>bar.remove();
 }
 </script>
 </body>
