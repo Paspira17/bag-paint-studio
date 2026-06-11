@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Bag Paint Studio</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FAF8F3">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<!-- iOS -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bag Paint">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Kanit:wght@300;400;500;600&display=swap');
+
+:root{
+  --cream:   #FAF8F3;
+  --navy:    #1B3A8C;
+  --navy2:   #142E72;
+  --rainbow: linear-gradient(90deg,#E8292A,#F5871F,#F5C800,#3AAA35,#2266CC,#8833BB);
+  --r-red:   #E8292A;
+  --r-org:   #F5871F;
+  --r-yel:   #F5C800;
+  --r-grn:   #3AAA35;
+  --r-blu:   #2266CC;
+  --r-pur:   #8833BB;
+  --divider: #EDE9E0;
+  --muted:   #9A96A0;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; }
+
+body{
+  font-family:'Inter','Kanit',sans-serif;
+  background:var(--cream);
+  color:#1a1a1a;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── SCREENS ── */
+.screen{ min-height:100vh; display:none; flex-direction:column; align-items:center; }
+.screen.active{ display:flex; }
+
+/* ══════════════════════════════
+   INTRO
+══════════════════════════════ */
+#s-intro{
+  justify-content:center;
+  padding:40px 24px;
+  background:var(--cream);
+}
+
+.intro-inner{ width:100%; max-width:480px; }
+
+.wordmark{
+  font-size:11px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--navy); margin-bottom:48px;
+  display:flex; align-items:center; gap:8px;
+}
+.wordmark-dot{
+  width:18px; height:5px; border-radius:3px;
+  background:var(--rainbow);
+}
+
+.intro-headline{
+  font-size:clamp(2rem,7vw,3.2rem); font-weight:300;
+  line-height:1.2; letter-spacing:-.02em;
+  color:var(--navy); margin-bottom:12px;
+}
+.intro-headline strong{
+  font-weight:800;
+  background:var(--rainbow);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.intro-sub{
+  font-size:.95rem; color:var(--muted); font-weight:300;
+  line-height:1.7; margin-bottom:40px; max-width:340px;
+}
+
+.intro-palette-preview{
+  display:flex; gap:5px; margin-bottom:40px;
+  border-radius:12px; overflow:hidden;
+}
+.ipp{ height:10px; flex:1; }
+
+.btn-main{
+  width:100%; position:relative;
+  background:var(--navy); color:#fff;
+  border:none; padding:18px 24px;
+  border-radius:14px; font-family:'Inter','Kanit',sans-serif;
+  font-size:.95rem; font-weight:600; cursor:pointer;
+  transition:all .2s; display:flex; align-items:center; justify-content:space-between;
+  overflow:hidden;
+}
+.btn-main::after{
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:var(--rainbow);
+}
+.btn-main:hover{ background:var(--navy2); transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,58,140,.25); }
+.btn-main .arrow{ font-size:1.2rem; }
+
+.btn-quiz{
+  width:100%; margin-top:12px;
+  background:white; color:var(--navy);
+  border:1.5px solid var(--divider); padding:16px 24px;
+  border-radius:14px; font-family:'Inter','Kanit',sans-serif;
+  font-size:.92rem; font-weight:500; cursor:pointer;
+  transition:all .2s;
+}
+.btn-quiz:hover{ border-color:var(--navy); background:rgba(27,58,140,.04); transform:translateY(-1px); }
+
+.intro-note{
+  margin-top:20px; font-size:.78rem; color:var(--muted); text-align:center;
+  line-height:1.6;
+}
+
+/* ══════════════════════════════
+   QUIZ ทายใจ
+══════════════════════════════ */
+#s-quiz{ background:var(--cream); justify-content:flex-start; padding:0 0 40px; }
+.quiz-top{
+  width:100%; padding:18px 20px; display:flex; align-items:center; gap:14px;
+  border-bottom:1px solid var(--divider); position:sticky; top:0;
+  background:var(--cream); z-index:10;
+}
+.quiz-back{
+  background:transparent; border:1.5px solid var(--divider); color:var(--navy);
+  width:36px; height:36px; border-radius:50%; cursor:pointer;
+  font-size:1rem; flex-shrink:0; transition:all .2s;
+}
+.quiz-back:hover{ border-color:var(--navy); }
+.quiz-progress{ flex:1; height:6px; background:var(--divider); border-radius:3px; overflow:hidden; }
+.quiz-progress-fill{
+  height:100%; width:0%; border-radius:3px;
+  background:var(--rainbow); transition:width .4s ease;
+}
+.quiz-count{ font-size:.75rem; color:var(--muted); font-weight:600; flex-shrink:0; }
+
+.quiz-body{ width:100%; max-width:480px; margin:0 auto; padding:32px 24px 0; }
+.quiz-num{
+  font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--navy); font-weight:600; margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.quiz-num::before{
+  content:''; display:inline-block; width:14px; height:3px;
+  background:var(--rainbow); border-radius:2px;
+}
+.quiz-q{
+  font-size:1.25rem; font-weight:600; color:var(--navy);
+  line-height:1.55; margin-bottom:24px;
+}
+.quiz-opt{
+  background:white; border:1.5px solid var(--divider);
+  border-radius:14px; padding:15px 18px; margin-bottom:12px;
+  cursor:pointer; transition:all .2s;
+  font-size:.92rem; color:#1a1a1a;
+  display:flex; align-items:center; gap:12px;
+}
+.quiz-opt:hover{
+  border-color:var(--navy); transform:translateY(-2px);
+  box-shadow:0 4px 14px rgba(27,58,140,.1);
+}
+.quiz-opt.sel{ border-color:var(--navy); background:rgba(27,58,140,.06); }
+.quiz-opt .qi{ font-size:1.35rem; flex-shrink:0; }
+
+.quiz-loading{ text-align:center; padding:70px 24px; }
+.quiz-loading-ring{
+  width:80px; height:80px; border-radius:50%;
+  background:conic-gradient(#E8292A,#F5871F,#F5C800,#3AAA35,#2266CC,#8833BB,#E8292A);
+  animation:spinRing 1.4s linear infinite;
+  margin:0 auto 24px;
+  display:flex; align-items:center; justify-content:center;
+}
+.quiz-loading-inner{
+  width:64px; height:64px; border-radius:50%; background:var(--cream);
+  display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+}
+.quiz-loading-text{ font-size:1rem; font-weight:600; color:var(--navy); }
+.quiz-loading-sub{ font-size:.8rem; color:var(--muted); margin-top:6px; }
+
+/* rainbow stripe — reusable */
+.rainbow-bar{
+  height:4px; border-radius:2px;
+  background:var(--rainbow);
+  margin-bottom:0;
+}
+
+/* ══════════════════════════════
+   CAMERA
+══════════════════════════════ */
+#s-camera{
+  background:#000;
+  justify-content:flex-end;
+  padding:0;
+}
+
+.cam-video-wrap{
+  position:fixed; inset:0; z-index:0;
+}
+#video{
+  width:100%; height:100%;
+  object-fit:cover;
+  transform:scaleX(-1);
+  display:block;
+}
+
+/* Scan overlay */
+.scan-overlay{
+  position:fixed; inset:0; z-index:1;
+  pointer-events:none; display:none;
+}
+.scan-line{
+  position:absolute; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 30%,white 50%,rgba(255,255,255,.6) 70%,transparent 100%);
+  box-shadow:0 0 16px rgba(255,255,255,.8);
+  animation:scanLine 1.8s ease-in-out infinite;
+}
+@keyframes scanLine{ 0%{top:10%;}100%{top:90%;} }
+
+/* Face guide */
+.face-guide{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.face-circle{
+  width:min(300px,76vw); height:min(300px,76vw);
+  border:2.5px solid rgba(255,255,255,.9);
+  border-radius:50%;
+  /* มืดทุกอย่างนอกวงกลม — ถ่ายได้เฉพาะในวง */
+  box-shadow:0 0 0 9999px rgba(0,0,0,.62);
+}
+
+/* corner brackets */
+.corners{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+}
+.c{ position:absolute; width:28px; height:28px; }
+.c::before,.c::after{ content:''; position:absolute; background:white; }
+.c::before{ width:100%; height:2px; top:0; }
+.c::after{ width:2px; height:100%; left:0; }
+.c.tl{ top:20px; left:20px; }
+.c.tr{ top:20px; right:20px; transform:scaleX(-1); }
+.c.bl{ bottom:20px; left:20px; transform:scaleY(-1); }
+.c.br{ bottom:20px; right:20px; transform:scale(-1); }
+
+/* cam UI bottom */
+.cam-ui{
+  position:relative; z-index:10;
+  width:100%; padding:24px 28px 40px;
+  background:linear-gradient(transparent,rgba(0,0,0,.75) 30%,rgba(0,0,0,.9));
+}
+.cam-hint{
+  font-size:.82rem; color:rgba(255,255,255,.6);
+  text-align:center; margin-bottom:20px; letter-spacing:.04em;
+}
+.btn-shutter{
+  width:72px; height:72px; border-radius:50%;
+  background:white; border:none; cursor:pointer;
+  margin:0 auto; display:block;
+  transition:transform .15s, box-shadow .15s;
+  box-shadow:0 0 0 6px rgba(255,255,255,.25);
+}
+.btn-shutter:active{ transform:scale(.92); }
+.btn-shutter-inner{
+  width:58px; height:58px; border-radius:50%;
+  background:white; border:3px solid #e0e0e0;
+  margin:7px;
+}
+.cam-back{
+  position:fixed; top:20px; left:20px; z-index:20;
+  background:rgba(0,0,0,.4); border:none; color:white;
+  width:40px; height:40px; border-radius:50%;
+  font-size:1.1rem; cursor:pointer; backdrop-filter:blur(8px);
+}
+
+/* ══════════════════════════════
+   ANALYZING
+══════════════════════════════ */
+#s-analyzing{
+  background:#0a0a0a;
+  justify-content:center;
+  padding:40px 24px;
+}
+
+.analyzing-inner{ width:100%; max-width:400px; text-align:center; }
+
+.photo-frame{
+  position:relative; width:220px; height:220px;
+  margin:0 auto 32px; border-radius:50%; overflow:hidden;
+}
+#analyze-photo{
+  width:100%; height:100%; object-fit:cover;
+}
+.photo-scan-overlay{
+  position:absolute; inset:0; border-radius:50%;
+  background:linear-gradient(transparent 60%, rgba(0,0,0,.5));
+}
+.photo-ring{
+  position:absolute; inset:-3px; border-radius:50%;
+  background:conic-gradient(from 0deg, #fff 0%, transparent 60%);
+  animation:spinRing 1.6s linear infinite;
+}
+.photo-ring-mask{
+  position:absolute; inset:3px; border-radius:50%; background:#0a0a0a;
+}
+@keyframes spinRing{ to{ transform:rotate(360deg); } }
+
+.a-label{
+  font-size:.72rem; letter-spacing:.15em; text-transform:uppercase;
+  color:#555; margin-bottom:10px;
+}
+.a-status{
+  font-size:1.05rem; font-weight:300; color:#f0f0f0;
+  margin-bottom:32px; min-height:1.6em;
+  transition:opacity .3s;
+}
+
+.a-steps{ display:flex; flex-direction:column; gap:0; width:100%; }
+.a-step{
+  display:flex; align-items:center; gap:14px; padding:12px 0;
+  border-bottom:1px solid #1a1a1a;
+  color:#444; font-size:.85rem; transition:all .3s;
+}
+.a-step:last-child{ border-bottom:none; }
+.a-step.done{ color:#555; }
+.a-step.active{ color:#f0f0f0; }
+.a-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:#2a2a2a; flex-shrink:0; transition:all .3s;
+}
+.a-step.done .a-dot{ background:#555; }
+.a-step.active .a-dot{ background:white; box-shadow:0 0 6px white; animation:dotPulse .8s infinite; }
+@keyframes dotPulse{ 0%,100%{transform:scale(1);}50%{transform:scale(1.8);} }
+
+/* ══════════════════════════════
+   RESULT
+══════════════════════════════ */
+#s-result{
+  background:var(--cream);
+  justify-content:flex-start;
+  padding:0;
+  padding-bottom:60px;
+}
+
+/* rainbow top bar */
+#s-result::before{
+  content:''; display:block; width:100%; height:4px;
+  background:var(--rainbow);
+  position:sticky; top:0; z-index:11; flex-shrink:0;
+}
+
+/* header strip */
+.result-header{
+  width:100%; padding:20px 24px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--divider);
+  background:var(--cream);
+  position:sticky; top:4px; z-index:10;
+}
+.result-header-left{ display:flex; flex-direction:column; }
+.rh-label{ font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.rh-type{ font-size:1.05rem; font-weight:700; color:var(--navy); }
+.btn-retry{
+  background:transparent; border:1.5px solid var(--divider);
+  color:var(--navy); padding:8px 16px; border-radius:8px;
+  font-family:'Inter',sans-serif; font-size:.78rem; font-weight:500; cursor:pointer;
+  transition:all .2s;
+}
+.btn-retry:hover{ border-color:var(--navy); background:rgba(27,58,140,.05); }
+
+.result-body{ width:100%; max-width:560px; padding:0 20px; margin:0 auto; }
+
+.sec-label{
+  font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--navy); font-weight:600; margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.sec-label::before{
+  content:''; display:inline-block; width:14px; height:3px;
+  background:var(--rainbow); border-radius:2px; flex-shrink:0;
+}
+
+/* ── CHARACTER HERO ── */
+.char-hero{
+  padding:32px 0 24px; border-bottom:1px solid var(--divider);
+  text-align:center;
+}
+.char-bubble{
+  position:relative; display:inline-block;
+  margin-bottom:20px;
+}
+.char-svg-big{
+  width:180px; height:180px; display:block; margin:0 auto;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.1));
+  animation:charBob 3s ease-in-out infinite;
+}
+@keyframes charBob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+
+/* floating badges around character */
+.char-badge{
+  position:absolute; background:white;
+  border-radius:50px; padding:6px 12px;
+  font-size:.72rem; font-weight:500; color:#1a1a1a;
+  box-shadow:0 2px 12px rgba(0,0,0,.1);
+  white-space:nowrap;
+}
+.badge-tl{ top:10px; left:-60px; }
+.badge-tr{ top:10px; right:-60px; }
+.badge-bl{ bottom:10px; left:-48px; }
+.badge-br{ bottom:10px; right:-48px; }
+
+.char-name-big{
+  font-size:1.4rem; font-weight:700; margin-bottom:6px; color:var(--navy);
+}
+.char-desc-big{
+  font-size:.88rem; color:var(--muted); line-height:1.7;
+  font-weight:300; max-width:280px; margin:0 auto;
+}
+
+/* ── QUOTE ── */
+.quote-section{
+  padding:20px; margin:0; border-bottom:1px solid var(--divider);
+  margin-bottom:0;
+}
+.quote-pill{
+  background:white; border-radius:14px; padding:18px 20px;
+  border-left:3px solid transparent;
+  border-image:var(--rainbow) 1;
+  box-shadow:0 2px 10px rgba(27,58,140,.06);
+}
+.quote-text{
+  font-size:.95rem; font-weight:400; line-height:1.8;
+  color:var(--navy); font-style:italic;
+}
+.quote-source{ font-size:.72rem; color:var(--muted); margin-top:8px; }
+
+/* ── PALETTE ── */
+.palette-section{ padding:28px 0 24px; border-bottom:1px solid var(--divider); }
+.palette-large{ display:flex; gap:8px; }
+.pl-swatch{
+  flex:1; height:110px; border-radius:12px;
+  display:flex; flex-direction:column;
+  justify-content:flex-end; padding:7px;
+  cursor:pointer; transition:transform .2s;
+  position:relative; overflow:hidden;
+}
+.pl-swatch:hover{ transform:scaleY(1.04); }
+.pl-swatch-name{
+  font-size:.56rem; font-weight:600;
+  background:rgba(0,0,0,.28); color:#fff;
+  padding:3px 5px; border-radius:4px;
+  backdrop-filter:blur(4px); align-self:center; text-align:center;
+  line-height:1.3;
+}
+
+/* ── DETECTED ── */
+.detected-section{ padding:20px 0 24px; border-bottom:1px solid var(--divider); }
+.detected-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.det-swatch{
+  width:44px; height:44px; border-radius:10px;
+  cursor:pointer; transition:transform .2s; position:relative;
+}
+.det-swatch:hover{ transform:scale(1.12); }
+.det-tooltip{
+  position:absolute; bottom:-24px; left:50%; transform:translateX(-50%);
+  background:#1a1a1a; color:white; font-size:.58rem;
+  padding:2px 6px; border-radius:4px; white-space:nowrap;
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
+}
+.det-swatch:hover .det-tooltip{ opacity:1; }
+
+/* ── COMBOS ── */
+.combo-section{ padding:24px 0; border-bottom:1px solid var(--divider); }
+.combo-row{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.combo{
+  display:flex; border-radius:12px; overflow:hidden;
+  height:54px; cursor:pointer; transition:transform .2s;
+  box-shadow:0 1px 6px rgba(0,0,0,.08); flex:1; min-width:140px;
+}
+.combo:hover{ transform:translateY(-2px); box-shadow:0 4px 14px rgba(0,0,0,.12); }
+.combo-swatch{ width:54px; height:100%; }
+.combo-label{
+  background:white; display:flex; align-items:center;
+  padding:0 14px; font-size:.72rem; color:var(--navy); font-weight:500;
+  border:1px solid var(--divider); border-left:none;
+  border-radius:0 12px 12px 0; flex:1;
+}
+
+/* ── INSPO ── */
+.inspo-section{ padding:24px 0; }
+.inspo-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+.inspo-cell{
+  border-radius:16px; aspect-ratio:1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  cursor:pointer; transition:transform .2s;
+  font-size:2rem; position:relative; overflow:hidden;
+}
+.inspo-cell:hover{ transform:scale(1.04); }
+.inspo-lbl{
+  position:absolute; bottom:0; left:0; right:0;
+  background:rgba(0,0,0,.25); font-size:.6rem;
+  padding:5px; text-align:center; color:white;
+  backdrop-filter:blur(4px);
+}
+
+/* ── PAINT TEMPLATES ── */
+.tpl-section{ padding:24px 0; border-bottom:1px solid var(--divider); }
+.tpl-grid{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:10px; margin-top:12px;
+}
+.tpl-cell{
+  background:white; border-radius:16px;
+  aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .2s;
+  border:1.5px solid var(--divider); position:relative;
+  overflow:hidden;
+}
+.tpl-cell:hover{
+  border-color:var(--navy); transform:scale(1.03);
+  box-shadow:0 4px 16px rgba(27,58,140,.1);
+}
+.tpl-cell svg{ width:72%; height:72%; }
+.tpl-lbl{
+  position:absolute; bottom:0; left:0; right:0;
+  background:var(--cream); font-size:.6rem; font-weight:500;
+  color:var(--navy); padding:5px; text-align:center;
+  border-top:1px solid var(--divider);
+}
+.tpl-hint{
+  font-size:.75rem; color:var(--muted); margin-top:10px;
+  text-align:center; line-height:1.6;
+}
+
+/* share */
+.share-section{ padding:24px 0 0; }
+.btn-share{
+  width:100%; position:relative; overflow:hidden;
+  background:var(--navy); color:#fff;
+  border:none; padding:16px; border-radius:12px;
+  font-family:'Inter','Kanit',sans-serif;
+  font-size:.9rem; font-weight:600; cursor:pointer;
+  transition:all .2s;
+}
+.btn-share::after{
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:var(--rainbow);
+}
+.btn-share:hover{ background:var(--navy2); transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,58,140,.25); }
+.btn-share-alt{
+  margin-top:10px; background:white; color:var(--navy);
+  border:1.5px solid var(--divider);
+}
+.btn-share-alt::after{ display:none; }
+.btn-share-alt:hover{ background:rgba(27,58,140,.04); border-color:var(--navy); box-shadow:none; }
+
+/* ── ANIMS ── */
+.fi{ animation:fi .4s ease both; }
+@keyframes fi{ from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+
+/* confetti */
+.cfp{ position:fixed;top:-20px;z-index:999;pointer-events:none;animation:cfFall linear forwards; }
+@keyframes cfFall{ to{transform:translateY(110vh)rotate(540deg);opacity:0;} }
+
+@media(max-width:400px){
+  .palette-large .pl-swatch{ height:80px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     INTRO
+══════════════════════════════ -->
+<div id="s-intro" class="screen active">
+  <div class="intro-inner">
+    <div class="wordmark">
+      <span class="wordmark-dot"></span>
+      AI Pride × Bag Paint Studio
+    </div>
+
+    <h1 class="intro-headline">
+      ถ่ายรูปหน้า<br>
+      <strong>รับ Palette</strong><br>
+      ระบายถุงผ้า
+    </h1>
+    <p class="intro-sub">AI วิเคราะห์สีจากรูปถ่าย สร้าง Color Palette และ Inspiration สำหรับ paint กระเป๋าของคุณ</p>
+
+    <div class="intro-palette-preview" id="intro-palette">
+      <div class="ipp" style="background:#E8292A"></div>
+      <div class="ipp" style="background:#F5871F"></div>
+      <div class="ipp" style="background:#F5C800"></div>
+      <div class="ipp" style="background:#3AAA35"></div>
+      <div class="ipp" style="background:#2266CC"></div>
+      <div class="ipp" style="background:#8833BB"></div>
+    </div>
+
+    <button class="btn-main" onclick="startCamera()">
+      <span>📸  เริ่มเลย — ถ่ายรูป แล้วทายใจ</span>
+      <span class="arrow">→</span>
+    </button>
+
+    <p class="intro-note">ต้องการสิทธิ์เข้ากล้อง • รูปไม่ถูกส่งไปที่ใด • ประมวลผลในเครื่อง</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CAMERA
+══════════════════════════════ -->
+<div id="s-camera" class="screen">
+  <div class="cam-video-wrap">
+    <video id="video" autoplay playsinline muted></video>
+  </div>
+
+  <div class="scan-overlay" id="scan-overlay">
+    <div class="scan-line"></div>
+  </div>
+
+  <div class="face-guide">
+    <div class="face-circle" id="face-circle"></div>
+  </div>
+
+  <div class="corners">
+    <div class="c tl"></div><div class="c tr"></div>
+    <div class="c bl"></div><div class="c br"></div>
+  </div>
+
+  <button class="cam-back" onclick="goHome()">←</button>
+
+  <div class="cam-ui">
+    <p class="cam-hint" id="cam-hint">วางหน้าในกรอบ</p>
+    <button class="btn-shutter" id="btn-shutter" onclick="capturePhoto()">
+      <div class="btn-shutter-inner"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     QUIZ ทายใจ
+══════════════════════════════ -->
+<div id="s-quiz" class="screen">
+  <div class="quiz-top">
+    <button class="quiz-back" onclick="goHome()">←</button>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-fill"></div></div>
+    <span class="quiz-count" id="quiz-count">1/5</span>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<!-- ══════════════════════════════
+     ANALYZING
+══════════════════════════════ -->
+<div id="s-analyzing" class="screen">
+  <div class="analyzing-inner">
+    <div class="photo-frame">
+      <img id="analyze-photo" src="" alt=""/>
+      <div class="photo-scan-overlay"></div>
+      <div class="photo-ring"></div>
+      <div class="photo-ring-mask"></div>
+    </div>
+
+    <div class="a-label">กำลังวิเคราะห์</div>
+    <div class="a-status" id="a-status">กำลังอ่านสี...</div>
+
+    <div class="a-steps">
+      <div class="a-step" id="as0"><div class="a-dot"></div>สแกนสีจากใบหน้า</div>
+      <div class="a-step" id="as1"><div class="a-dot"></div>สร้าง Color Palette</div>
+      <div class="a-step" id="as2"><div class="a-dot"></div>อ่านโทนสีของคุณ</div>
+      <div class="a-step" id="as3"><div class="a-dot"></div>เตรียมคำถามทายใจ 5 ข้อ</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RESULT
+══════════════════════════════ -->
+<div id="s-result" class="screen">
+  <div class="result-header">
+    <div class="result-header-left">
+      <span class="rh-label">Your Bag Palette</span>
+      <span class="rh-type" id="rh-type">—</span>
+    </div>
+    <button class="btn-retry" onclick="goHome()">↩ ลองใหม่</button>
+  </div>
+  <div class="result-body" id="result-body"></div>
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+/* ══════════════════════════════════════
+   PERSONALITY DATA
+══════════════════════════════════════ */
+const P = {
+  A:{
+    name:"Soft Blossom", emoji:"🌸",
+    desc:"อ่อนโยน หวาน มีเสน่ห์เงียบๆ",
+    quotes:[
+      "วันนี้ฉันน่ารักพอแล้ว ขอไม่พยายามเพิ่มแล้วนะ 🌸",
+      "ใจดีกับตัวเองก่อน เดี๋ยวความน่ารักตามมาเอง 🫧",
+      "เบาๆ กับฉันหน่อย วันนี้หัวใจเปราะบางเป็นพิเศษ 🎀",
+      "ความหวานของฉันไม่มีน้ำตาล แต่คนเผลอยิ้มตามทุกที 🍓",
+      "ฉันไม่ได้ขี้อาย แค่กำลังชาร์จพลังความน่ารักอยู่ 🌷",
+      "โลกจะโหดแค่ไหน ฉันก็ยังเลือกใจดีอยู่ดี ☁️",
+      "กอดตัวเองวันละครั้ง คือสกินแคร์ที่ดีที่สุด 💝",
+    ],
+    vibes:["🌸 Gentle","✨ Dreamy","🫧 Soft","💝 Sweet"],
+    palette:[
+      {c:"#F2B8C6",n:"Blush Pink"},
+      {c:"#D4A0D4",n:"Lavender"},
+      {c:"#A8D4C0",n:"Mint"},
+      {c:"#F5DEB3",n:"Wheat"},
+      {c:"#E8C4CC",n:"Dusty Rose"},
+      {c:"#B8CDE8",n:"Periwinkle"},
+    ],
+    combos:[
+      {a:"#F2B8C6",b:"#D4A0D4",l:"Sweet Duo"},
+      {a:"#A8D4C0",b:"#F5DEB3",l:"Soft Garden"},
+      {a:"#E8C4CC",b:"#B8CDE8",l:"Cloud Pair"},
+    ],
+    inspo:[
+      {e:"🌸",bg:"#F9E4ED",l:"Cherry Blossom"},
+      {e:"🫐",bg:"#E8D4F0",l:"Berry Fields"},
+      {e:"🍵",bg:"#D4EBE0",l:"Matcha Latte"},
+      {e:"🌙",bg:"#E0D0E8",l:"Moon Garden"},
+      {e:"🎀",bg:"#F5DCE8",l:"Ribbon Bow"},
+      {e:"🧁",bg:"#F0D8EC",l:"Cupcake"},
+    ],
+    cc:"#F2B8C6", grad:"linear-gradient(135deg,#f4b8c8,#d4a0d4,#a8d8c8)",
+  },
+  B:{
+    name:"Sunshine Vibe", emoji:"☀️",
+    desc:"พลังงานสูง สนุกสนาน สว่างจ้า",
+    quotes:[
+      "ฉันไม่ได้เสียงดัง ฉันแค่มีความสุขเกินกว่าจะเก็บไว้คนเดียว ☀️",
+      "ยิ้มก่อน เรื่องอื่นค่อยว่ากัน 😄",
+      "พลังงานฉันมาจากเสียงหัวเราะ ไม่ใช่กาแฟ 🍊",
+      "วันไหนไม่สนุก ฉันจะทำให้มันสนุกเอง 🎡",
+      "เกิดมาเพื่อเป็นวิตามินให้คนรอบข้าง 🌻",
+      "ชีวิตสั้นเกินกว่าจะทำหน้าบึ้ง 🍉",
+      "แดดจะแรงแค่ไหน ก็ไม่เท่ารอยยิ้มฉัน ✨",
+    ],
+    vibes:["☀️ Bright","⚡ Energy","😂 Fun","🥳 Vibe"],
+    palette:[
+      {c:"#F5C842",n:"Golden"},
+      {c:"#F28C3C",n:"Tangerine"},
+      {c:"#F07070",n:"Coral"},
+      {c:"#F8E878",n:"Lemon"},
+      {c:"#F0A040",n:"Amber"},
+      {c:"#F05870",n:"Watermelon"},
+    ],
+    combos:[
+      {a:"#F5C842",b:"#F28C3C",l:"Citrus"},
+      {a:"#F8E878",b:"#F07070",l:"Summer Pop"},
+      {a:"#F0A040",b:"#F05870",l:"Sunset"},
+    ],
+    inspo:[
+      {e:"🍊",bg:"#FEF0D0",l:"Citrus"},
+      {e:"🌻",bg:"#FEF4C0",l:"Sunflower"},
+      {e:"🎡",bg:"#FDDCC0",l:"Fairground"},
+      {e:"🍉",bg:"#FCDCD8",l:"Watermelon"},
+      {e:"🌴",bg:"#FDE8C0",l:"Tropical"},
+      {e:"🦜",bg:"#FDE0C0",l:"Parrot"},
+    ],
+    cc:"#F5C842", grad:"linear-gradient(135deg,#f5c842,#f28c3c,#f07070)",
+  },
+  C:{
+    name:"Midnight Mystic", emoji:"🌙",
+    desc:"ลึกลับ มีความลึก ชอบอยู่กับตัวเอง",
+    quotes:[
+      "ฉันไม่ได้เก็บตัว ฉันแค่คัดเลือกคนที่คู่ควรจะได้คุยด้วย 🌙",
+      "ตอนทุกคนหลับ คือตอนที่ไอเดียฉันตื่น 🌌",
+      "เงียบไม่ได้แปลว่าไม่มีอะไรจะพูด แค่กำลังคิดอยู่ 🔮",
+      "ความลึกลับคือเสน่ห์ที่ไม่ต้องพยายาม 🖤",
+      "ฉันคุยกับดวงดาวรู้เรื่องกว่าคุยกับคนบางคน ⭐",
+      "โลกของฉันเปิดให้เข้าเฉพาะผู้ได้รับเชิญ 🕯️",
+      "กลางคืนไม่ได้น่ากลัว มันแค่ซื่อสัตย์กว่ากลางวัน 🦋",
+    ],
+    vibes:["🌙 Mystic","🔮 Intuitive","💫 Deep","🖤 Aesthetic"],
+    palette:[
+      {c:"#3D2080",n:"Deep Violet"},
+      {c:"#7040F0",n:"Electric Purple"},
+      {c:"#20C8E8",n:"Neon Cyan"},
+      {c:"#18184A",n:"Midnight"},
+      {c:"#9060C0",n:"Amethyst"},
+      {c:"#D8B8F8",n:"Lilac Mist"},
+    ],
+    combos:[
+      {a:"#3D2080",b:"#7040F0",l:"Deep Space"},
+      {a:"#7040F0",b:"#20C8E8",l:"Neon Night"},
+      {a:"#9060C0",b:"#D8B8F8",l:"Twilight"},
+    ],
+    inspo:[
+      {e:"🔮",bg:"#2A1560",l:"Crystal Ball"},
+      {e:"🌌",bg:"#101840",l:"Galaxy"},
+      {e:"🕯️",bg:"#3A2060",l:"Candlelight"},
+      {e:"🦋",bg:"#5030A0",l:"Night Moth"},
+      {e:"🌃",bg:"#181840",l:"City Night"},
+      {e:"⭐",bg:"#201070",l:"Star Dust"},
+    ],
+    cc:"#7040F0", grad:"linear-gradient(135deg,#3d2080,#7040f0,#20c8e8)",
+  },
+  D:{
+    name:"Nature Soul", emoji:"🌿",
+    desc:"สงบ รักธรรมชาติ ชอบช้าๆ ให้สวยงาม",
+    quotes:[
+      "ฉันไม่ได้ช้า ฉันแค่ใช้ชีวิตให้ละเมียดกว่าคนอื่นต่างหาก 🌿",
+      "ต้นไม้ยังโตช้าๆ แล้วทำไมฉันต้องรีบ 🌱",
+      "ความสงบหาซื้อไม่ได้ แต่ชงเองได้ทุกเช้า 🍵",
+      "ขอแดดอุ่นๆ กาแฟหอมๆ แค่นี้ก็พอใจแล้ว ☕",
+      "ฉันสื่อสารกับต้นไม้ได้ดีกว่าตอบแชท 🪴",
+      "ชีวิตดีๆ เริ่มจากหายใจลึกๆ หนึ่งครั้ง 🍃",
+      "ไม่ต้องรีบบาน ดอกไม้ทุกดอกมีฤดูของตัวเอง 🌾",
+    ],
+    vibes:["🌿 Calm","🍃 Natural","🌲 Grounded","☕ Cozy"],
+    palette:[
+      {c:"#3A6830",n:"Forest Green"},
+      {c:"#88C040",n:"Lime Leaf"},
+      {c:"#C89858",n:"Caramel"},
+      {c:"#F0EAD8",n:"Linen"},
+      {c:"#604030",n:"Earth"},
+      {c:"#A0D4A0",n:"Sage"},
+    ],
+    combos:[
+      {a:"#3A6830",b:"#88C040",l:"Forest"},
+      {a:"#C89858",b:"#F0EAD8",l:"Earthy Warm"},
+      {a:"#A0D4A0",b:"#C89858",l:"Garden Walk"},
+    ],
+    inspo:[
+      {e:"🌿",bg:"#D4E8C8",l:"Botanical"},
+      {e:"🍄",bg:"#E8D8B8",l:"Mushroom"},
+      {e:"☕",bg:"#E0C898",l:"Coffee"},
+      {e:"🌾",bg:"#F0E8C8",l:"Golden Field"},
+      {e:"🪴",bg:"#C8E0C8",l:"Plant Mom"},
+      {e:"🍵",bg:"#C0D8C0",l:"Matcha Zen"},
+    ],
+    cc:"#88C040", grad:"linear-gradient(135deg,#3a6830,#88c040,#f0ead8)",
+  },
+  E:{
+    name:"Fire Spirit", emoji:"🔥",
+    desc:"กล้า โดดเด่น ไม่กลัวใคร",
+    quotes:[
+      "ฉันไม่ได้เรื่องเยอะ ชีวิตฉันแค่จัดเต็มทุกฉากเอง 🔥",
+      "เกิดมาทั้งที ขอเป็นตัวเอกทุกฉากละกัน 👑",
+      "ความกลัวก็กลัวฉันเหมือนกัน 💥",
+      "ถ้าไม่มีไฟ ฉันจะจุดเอง ⚡",
+      "เดินเข้าห้องทีไร ห้องสว่างขึ้นทุกที 🌶️",
+      "ฝันให้ใหญ่ แล้วลุยให้สุด ไม่มีครึ่งทาง 🏎️",
+    ],
+    vibes:["🔥 Bold","💥 Fierce","👑 Iconic","⚡ Intense"],
+    palette:[
+      {c:"#E00038",n:"Crimson"},
+      {c:"#E84000",n:"Flame"},
+      {c:"#E86000",n:"Blaze"},
+      {c:"#F8C800",n:"Gold"},
+      {c:"#E81488",n:"Hot Pink"},
+      {c:"#E06060",n:"Lava"},
+    ],
+    combos:[
+      {a:"#E00038",b:"#E84000",l:"Fire"},
+      {a:"#F8C800",b:"#E84000",l:"Ember Gold"},
+      {a:"#E81488",b:"#E00038",l:"Neon Punk"},
+    ],
+    inspo:[
+      {e:"🔥",bg:"#F8D0D0",l:"Fire"},
+      {e:"👑",bg:"#F8ECC0",l:"Royal"},
+      {e:"🌶️",bg:"#F8C8C0",l:"Spicy"},
+      {e:"💥",bg:"#F8C0D8",l:"Explosion"},
+      {e:"🏎️",bg:"#F8D8C0",l:"Speed"},
+      {e:"🦊",bg:"#F8D8C0",l:"Fox"},
+    ],
+    cc:"#E00038", grad:"linear-gradient(135deg,#e00038,#e86000,#f8c800)",
+  },
+  F:{
+    name:"Rainbow Dreamer", emoji:"🌈",
+    desc:"สร้างสรรค์ หลากสี ไม่ยอมอยู่ในกรอบ",
+    quotes:[
+      "ทำไมต้องเลือกสีเดียว ในเมื่อโลกมีทุกสี? 🌈",
+      "กรอบมีไว้ให้คนอื่นอยู่ ฉันขอวาดนอกเส้น 🎨",
+      "ความฝันของฉันมีหลายสีเกินกว่าจะเล่าจบในวันเดียว 🦄",
+      "ปกติไปก็เท่านั้น แปลกแบบฉันสนุกกว่า ✨",
+      "ไอเดียฉันเหมือนลูกอม หยิบเม็ดไหนก็หวานคนละแบบ 🍭",
+      "ชีวิตคือผืนผ้าใบ และฉันไม่เคยกลัวสีเลอะมือ 🎆",
+    ],
+    vibes:["🌈 Colorful","🎨 Creative","✨ Magical","🦄 Unique"],
+    palette:[
+      {c:"#E80038",n:"Strawberry"},
+      {c:"#E88000",n:"Mango"},
+      {c:"#F8D000",n:"Sunshine"},
+      {c:"#00C050",n:"Emerald"},
+      {c:"#0060F0",n:"Ocean"},
+      {c:"#A000F0",n:"Violet"},
+    ],
+    combos:[
+      {a:"#E80038",b:"#F8D000",l:"Fire & Sun"},
+      {a:"#00C050",b:"#0060F0",l:"Ocean & Leaf"},
+      {a:"#A000F0",b:"#E80038",l:"Electric"},
+    ],
+    inspo:[
+      {e:"🌈",bg:"#F0E0F8",l:"Rainbow"},
+      {e:"🦄",bg:"#ECD4F8",l:"Unicorn"},
+      {e:"🎡",bg:"#FCF0D0",l:"Carnival"},
+      {e:"🍭",bg:"#F0DCF0",l:"Candy"},
+      {e:"🎆",bg:"#D8E8F8",l:"Fireworks"},
+      {e:"🎨",bg:"#F8ECE0",l:"Art Splash"},
+    ],
+    cc:"#A000F0", grad:"linear-gradient(135deg,#e80038,#f8d000,#00c050,#0060f0,#a000f0)",
+  },
+};
+
+/* ══════════════════════════════════════
+   SVG CHARACTERS (minimal style)
+══════════════════════════════════════ */
+function charSVG(type){
+  const p=P[type], c=p.cc;
+  const svgs={
+    A:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="38" r="22" fill="#fde8d8"/>
+      <ellipse cx="40" cy="43" rx="5" ry="3" fill="${c}" opacity=".6"/>
+      <ellipse cx="60" cy="43" rx="5" ry="3" fill="${c}" opacity=".6"/>
+      <circle cx="44" cy="36" r="3.5" fill="#444"/>
+      <circle cx="56" cy="36" r="3.5" fill="#444"/>
+      <circle cx="45" cy="35" r="1.2" fill="white"/>
+      <circle cx="57" cy="35" r="1.2" fill="white"/>
+      <path d="M44,46 Q50,52 56,46" stroke="#c07080" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="73" rx="20" ry="24" fill="${c}"/>
+      <circle cx="50" cy="20" r="6" fill="${c}"/>
+      <circle cx="44" cy="22" r="4" fill="${c}" opacity=".7"/>
+      <circle cx="56" cy="22" r="4" fill="${c}" opacity=".7"/>
+      <ellipse cx="28" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(-15,28,68)"/>
+      <ellipse cx="72" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(15,72,68)"/>
+    </svg>`,
+    B:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="38" r="22" fill="#fde8d8"/>
+      <rect x="37" y="33" width="10" height="7" rx="3.5" fill="#333"/>
+      <rect x="53" y="33" width="10" height="7" rx="3.5" fill="#333"/>
+      <line x1="47" y1="36.5" x2="53" y2="36.5" stroke="#333" stroke-width="1.5"/>
+      <rect x="37" y="33" width="10" height="3.5" rx="3" fill="${c}" opacity=".5"/>
+      <rect x="53" y="33" width="10" height="3.5" rx="3" fill="${c}" opacity=".5"/>
+      <ellipse cx="40" cy="46" rx="4" ry="2.5" fill="${c}" opacity=".4"/>
+      <ellipse cx="60" cy="46" rx="4" ry="2.5" fill="${c}" opacity=".4"/>
+      <path d="M43,48 Q50,55 57,48" stroke="#333" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="26" rx="22" ry="11" fill="#333"/>
+      <ellipse cx="36" cy="31" rx="7" ry="10" fill="#333" transform="rotate(-15,36,31)"/>
+      <ellipse cx="50" cy="73" rx="21" ry="23" fill="${c}"/>
+      <ellipse cx="28" cy="65" rx="7" ry="12" fill="${c}" transform="rotate(-25,28,65)"/>
+      <ellipse cx="72" cy="60" rx="7" ry="12" fill="${c}" transform="rotate(30,72,60)"/>
+    </svg>`,
+    C:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="38" r="22" fill="#e8d8f4"/>
+      <ellipse cx="43" cy="35" rx="6" ry="4" fill="${c}" opacity=".35"/>
+      <ellipse cx="57" cy="35" rx="6" ry="4" fill="${c}" opacity=".35"/>
+      <circle cx="43" cy="37" r="3.5" fill="#1a0040"/>
+      <circle cx="57" cy="37" r="3.5" fill="#1a0040"/>
+      <circle cx="44" cy="36" r="1.2" fill="white"/>
+      <circle cx="58" cy="36" r="1.2" fill="white"/>
+      <path d="M45,47 Q50,51 55,47" stroke="#7040c0" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="73" rx="20" ry="24" fill="${c}"/>
+      <ellipse cx="50" cy="24" rx="23" ry="12" fill="${c}"/>
+      <ellipse cx="32" cy="32" rx="9" ry="13" fill="${c}" transform="rotate(-10,32,32)"/>
+      <ellipse cx="68" cy="32" rx="9" ry="13" fill="${c}" transform="rotate(10,68,32)"/>
+      <ellipse cx="28" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(-15,28,68)"/>
+      <ellipse cx="72" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(15,72,68)"/>
+    </svg>`,
+    D:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="38" r="22" fill="#f5e6c8"/>
+      <circle cx="40" cy="43" r="1.5" fill="#c89858" opacity=".7"/>
+      <circle cx="37" cy="41" r="1" fill="#c89858" opacity=".5"/>
+      <circle cx="60" cy="43" r="1.5" fill="#c89858" opacity=".7"/>
+      <circle cx="63" cy="41" r="1" fill="#c89858" opacity=".5"/>
+      <circle cx="44" cy="36" r="3.5" fill="#4a3020"/>
+      <circle cx="56" cy="36" r="3.5" fill="#4a3020"/>
+      <circle cx="45" cy="35" r="1.2" fill="white"/>
+      <circle cx="57" cy="35" r="1.2" fill="white"/>
+      <path d="M41,32 Q44,30 47,32" stroke="#4a3020" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M53,32 Q56,30 59,32" stroke="#4a3020" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M44,47 Q50,53 56,47" stroke="#4a3020" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="73" rx="20" ry="24" fill="${c}"/>
+      <ellipse cx="50" cy="73" rx="14" ry="18" fill="#f5f0e0" opacity=".7"/>
+      <ellipse cx="50" cy="24" rx="23" ry="11" fill="#4a3020"/>
+      <ellipse cx="41" cy="22" rx="6" ry="8" fill="${c}" transform="rotate(-20,41,22)"/>
+      <ellipse cx="50" cy="20" rx="6" ry="8" fill="${c}"/>
+      <ellipse cx="59" cy="22" rx="6" ry="8" fill="${c}" transform="rotate(20,59,22)"/>
+      <ellipse cx="28" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(-15,28,68)"/>
+      <ellipse cx="72" cy="68" rx="7" ry="12" fill="${c}" transform="rotate(15,72,68)"/>
+    </svg>`,
+    E:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="38" r="22" fill="#f8d8c8"/>
+      <path d="M40,32 L48,36" stroke="#1a0000" stroke-width="2" stroke-linecap="round"/>
+      <path d="M52,36 L60,32" stroke="#1a0000" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="44" cy="38" r="3.5" fill="#1a0000"/>
+      <circle cx="56" cy="38" r="3.5" fill="#1a0000"/>
+      <circle cx="45" cy="37" r="1.2" fill="white"/>
+      <circle cx="57" cy="37" r="1.2" fill="white"/>
+      <path d="M45,48 Q52,54 58,48" stroke="#1a0000" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="38" cy="44" rx="4" ry="2.5" fill="${c}" opacity=".35"/>
+      <ellipse cx="62" cy="44" rx="4" ry="2.5" fill="${c}" opacity=".35"/>
+      <ellipse cx="50" cy="73" rx="21" ry="23" fill="${c}"/>
+      <ellipse cx="50" cy="24" rx="22" ry="13" fill="#1a0000"/>
+      <ellipse cx="33" cy="30" rx="8" ry="13" fill="#1a0000" transform="rotate(-30,33,30)"/>
+      <ellipse cx="67" cy="28" rx="8" ry="11" fill="#1a0000" transform="rotate(30,67,28)"/>
+      <ellipse cx="50" cy="20" rx="12" ry="8" fill="${c}" opacity=".6"/>
+      <ellipse cx="26" cy="63" rx="7" ry="12" fill="${c}" transform="rotate(-35,26,63)"/>
+      <ellipse cx="74" cy="61" rx="7" ry="12" fill="${c}" transform="rotate(40,74,61)"/>
+    </svg>`,
+    F:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="rw" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#E80038"/>
+        <stop offset="33%" stop-color="#F8D000"/>
+        <stop offset="66%" stop-color="#00C050"/>
+        <stop offset="100%" stop-color="#A000F0"/>
+      </linearGradient></defs>
+      <circle cx="50" cy="38" r="22" fill="#fff0e8"/>
+      <ellipse cx="43" cy="34" rx="6" ry="3.5" fill="#E88000" opacity=".4"/>
+      <ellipse cx="57" cy="34" rx="6" ry="3.5" fill="#A000F0" opacity=".4"/>
+      <circle cx="44" cy="37" r="3.5" fill="#1a1a3a"/>
+      <circle cx="56" cy="37" r="3.5" fill="#1a1a3a"/>
+      <circle cx="45" cy="36" r="1.5" fill="white"/>
+      <circle cx="57" cy="36" r="1.5" fill="white"/>
+      <text x="42" y="39" font-size="4" fill="white">★</text>
+      <text x="54" y="39" font-size="4" fill="white">★</text>
+      <path d="M43,47 Q50,54 57,47" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="38" cy="44" rx="5" ry="3" fill="#E88000" opacity=".45"/>
+      <ellipse cx="62" cy="44" rx="5" ry="3" fill="#A000F0" opacity=".45"/>
+      <ellipse cx="50" cy="73" rx="21" ry="23" fill="url(#rw)"/>
+      <ellipse cx="50" cy="23" rx="24" ry="13" fill="url(#rw)"/>
+      <ellipse cx="33" cy="30" rx="9" ry="14" fill="#E80038" opacity=".85" transform="rotate(-15,33,30)"/>
+      <ellipse cx="67" cy="30" rx="9" ry="14" fill="#A000F0" opacity=".85" transform="rotate(15,67,30)"/>
+      <ellipse cx="28" cy="67" rx="7" ry="12" fill="#E88000" transform="rotate(-20,28,67)"/>
+      <ellipse cx="72" cy="67" rx="7" ry="12" fill="#0060F0" transform="rotate(20,72,67)"/>
+    </svg>`,
+  };
+  return svgs[type]||svgs.F;
+}
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let stream=null, capturedURL='', detColors=[];
+let photoScores=null;        // คะแนนจากสีรูปถ่าย (null = เล่นควิซอย่างเดียว)
+let currentType='', currentQuote=''; // ผลล่าสุด ใช้ตอน save card / share
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+}
+function goHome(){
+  stopCam();
+  photoScores=null; detColors=[];
+  document.getElementById('card-modal')?.remove();
+  show('intro');
+}
+
+/* ══════════════════════════════════════
+   CAMERA
+══════════════════════════════════════ */
+async function startCamera(){
+  show('camera');
+  // reset สถานะจากการถ่ายครั้งก่อน
+  document.querySelectorAll('.snap-preview').forEach(el=>el.remove());
+  document.getElementById('scan-overlay').style.display='none';
+  document.getElementById('video').style.display='block';
+  const shutter=document.getElementById('btn-shutter');
+  shutter.disabled=false;
+  shutter.onclick=capturePhoto;
+  document.getElementById('cam-hint').textContent='กำลังเปิดกล้อง...';
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user',width:{ideal:1280},height:{ideal:1280}},audio:false
+    });
+    const v=document.getElementById('video');
+    v.srcObject=stream; await v.play();
+    document.getElementById('cam-hint').textContent='วางหน้าในวงกลม แล้วกดปุ่ม';
+  }catch(e){
+    document.getElementById('cam-hint').textContent='เปิดกล้องไม่ได้ — กดปุ่มเพื่อข้ามไปเล่นควิซเลย 🔮';
+    shutter.onclick=()=>startQuiz();
+  }
+}
+
+function stopCam(){
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+}
+
+function capturePhoto(){
+  const v=document.getElementById('video');
+  if(!v.videoWidth) return;
+  const c=document.getElementById('canvas');
+  const OUT=512;
+  c.width=OUT; c.height=OUT;
+  const ctx=c.getContext('2d');
+
+  // map วงกลม guide บนจอ → พิกัดในเฟรมวิดีโอ (video เต็มจอแบบ object-fit:cover, จัดกึ่งกลาง)
+  const guide=document.getElementById('face-circle').getBoundingClientRect();
+  const scale=Math.max(window.innerWidth/v.videoWidth, window.innerHeight/v.videoHeight);
+  const rVid=(guide.width/2)/scale;
+  const cx=v.videoWidth/2, cy=v.videoHeight/2;
+
+  // พื้นนอกวงกลมเป็นสีครีม + clip วงกลม → ได้เฉพาะภาพในวง
+  ctx.fillStyle='#FAF8F3';
+  ctx.fillRect(0,0,OUT,OUT);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(OUT/2,OUT/2,OUT/2,0,Math.PI*2);
+  ctx.clip();
+  ctx.translate(OUT,0); ctx.scale(-1,1); // mirror ให้ตรงกับที่เห็นในจอ
+  ctx.drawImage(v, cx-rVid, cy-rVid, rVid*2, rVid*2, 0, 0, OUT, OUT);
+  ctx.restore();
+  capturedURL=c.toDataURL('image/jpeg',.88);
+
+  document.getElementById('scan-overlay').style.display='block';
+  stopCam();
+  document.getElementById('video').style.display='none';
+
+  // แสดงภาพที่ถ่าย เฉพาะในวงกลมตำแหน่งเดิม
+  const box=document.getElementById('s-camera');
+  const old=box.querySelector('.snap-preview');
+  if(old)old.remove();
+  const img=document.createElement('img');
+  img.className='snap-preview';
+  img.src=capturedURL;
+  img.style.cssText=`position:fixed;left:${guide.left}px;top:${guide.top}px;width:${guide.width}px;height:${guide.height}px;border-radius:50%;object-fit:cover;z-index:1;`;
+  box.prepend(img);
+
+  document.getElementById('cam-hint').textContent='⚡ กำลังวิเคราะห์...';
+  document.getElementById('btn-shutter').disabled=true;
+
+  detColors=extractColors(c);
+  photoScores=colorsToScores(detColors);
+  setTimeout(()=>runAnalysis(),600);
+}
+
+/* ── color extraction ── */
+function extractColors(cvs){
+  const ctx=cvs.getContext('2d');
+  const d=ctx.getImageData(0,0,cvs.width,cvs.height).data;
+  const cx=cvs.width/2, cy=cvs.height/2;
+  // canvas คือภาพวงกลมเต็มใบ — sample เฉพาะในวง (กันสีครีมที่มุม)
+  const rx=cvs.width*.46, ry=cvs.height*.46;
+  const buckets={};
+  for(let y=0;y<cvs.height;y+=6){
+    for(let x=0;x<cvs.width;x+=6){
+      if(((x-cx)/rx)**2+((y-cy)/ry)**2>1) continue;
+      const i=(y*cvs.width+x)*4;
+      const r=Math.round(d[i]/32)*32;
+      const g=Math.round(d[i+1]/32)*32;
+      const b=Math.round(d[i+2]/32)*32;
+      const k=`${r},${g},${b}`;
+      buckets[k]=(buckets[k]||0)+1;
+    }
+  }
+  return Object.entries(buckets).sort((a,b)=>b[1]-a[1]).slice(0,8)
+    .map(([k])=>{const[r,g,b]=k.split(',').map(Number);return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');});
+}
+
+function hsl(hex){
+  let r=parseInt(hex.slice(1,3),16)/255;
+  let g=parseInt(hex.slice(3,5),16)/255;
+  let b=parseInt(hex.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  let h,s,l=(mx+mn)/2;
+  if(mx===mn){h=s=0;}
+  else{
+    const d=mx-mn; s=l>.5?d/(2-mx-mn):d/(mx+mn);
+    switch(mx){
+      case r:h=((g-b)/d+(g<b?6:0))/6;break;
+      case g:h=((b-r)/d+2)/6;break;
+      default:h=((r-g)/d+4)/6;
+    }
+    h*=360;
+  }
+  return{h,s,l};
+}
+
+function colorsToScores(colors){
+  const sc={A:0,B:0,C:0,D:0,E:0,F:0};
+  const hueBuckets=new Set();
+  colors.forEach(hex=>{
+    const{h,s,l}=hsl(hex);
+    hueBuckets.add(Math.floor(h/60));
+    if(s<.18){sc.D+=2;sc.A+=1;}
+    else if(h>=320||h<15){sc.E+=2;sc.A+=1;}
+    else if(h>=15&&h<50){sc.B+=3;}
+    else if(h>=50&&h<80){sc.B+=2;sc.D+=1;}
+    else if(h>=80&&h<165){sc.D+=2;sc.F+=1;}
+    else if(h>=165&&h<225){sc.C+=2;sc.F+=1;}
+    else if(h>=225&&h<285){sc.C+=3;}
+    else if(h>=285&&h<320){sc.C+=1;sc.A+=2;}
+    if(l>.68&&s>.3) sc.B+=1;
+    if(l<.32) sc.C+=1;
+    if(l>.62&&s<.28) sc.A+=1;
+  });
+  if(hueBuckets.size>=5) sc.F+=4;
+  return sc;
+}
+
+/* ── analysis animation → ต่อด้วยควิซทายใจ ── */
+function runAnalysis(){
+  show('analyzing');
+  document.getElementById('analyze-photo').src=capturedURL;
+
+  const steps=[
+    {msg:'สแกนสีจากใบหน้า...', id:'as0'},
+    {msg:'สร้าง Color Palette...', id:'as1'},
+    {msg:'อ่านโทนสีของคุณ...', id:'as2'},
+    {msg:'เตรียมคำถามทายใจ 5 ข้อ...', id:'as3'},
+  ];
+  // reset สถานะ step จากรอบก่อน
+  steps.forEach(s=>{
+    const el=document.getElementById(s.id);
+    el.classList.remove('active','done');
+  });
+  steps.forEach((s,i)=>{
+    setTimeout(()=>{
+      document.getElementById('a-status').textContent=s.msg;
+      const el=document.getElementById(s.id);
+      el.classList.add('active');
+      if(i>0){
+        const prev=document.getElementById(steps[i-1].id);
+        prev.classList.remove('active');
+        prev.classList.add('done');
+      }
+    },i*750);
+  });
+  setTimeout(()=>{
+    document.getElementById(steps[steps.length-1].id).classList.remove('active');
+    document.getElementById(steps[steps.length-1].id).classList.add('done');
+    document.getElementById('a-status').textContent='ไปทายใจกันต่อ! 🔮';
+  },steps.length*750);
+  setTimeout(()=>startQuiz(true),steps.length*750+600);
+}
+
+/* ══════════════════════════════════════
+   QUIZ ทายใจ — 5 ข้อ
+══════════════════════════════════════ */
+const QUIZ=[
+  {q:"ตื่นนอนวันหยุด สิ่งแรกที่คุณทำคือ?",opts:[
+    {i:"☁️",t:"นอนต่ออีกสักรอบ สบายที่สุด",y:"D"},
+    {i:"📱",t:"หยิบมือถือไถฟีดทุกแอป",y:"B"},
+    {i:"🌙",t:"นอนคิดว่าเมื่อคืนฝันอะไร",y:"C"},
+    {i:"⚡",t:"ลุกเลย! วันนี้ต้องมีอะไรสนุก",y:"E"}]},
+  {q:"ถ้าหยิบสีได้แค่กระปุกเดียว จะหยิบ?",opts:[
+    {i:"🩷",t:"พาสเทลหวานๆ ละมุนใจ",y:"A"},
+    {i:"🔥",t:"สีสดแสบตา เห็นแล้วต้องหันมอง",y:"E"},
+    {i:"💜",t:"สีเข้มลึกๆ มีความลับซ่อนอยู่",y:"C"},
+    {i:"🌈",t:"ไม่ได้! ขอหลายสี เลือกไม่ได้จริงๆ",y:"F"}]},
+  {q:"ขนมที่เป็นตัวคุณที่สุด?",opts:[
+    {i:"🍰",t:"เค้กสตรอว์เบอร์รี่ นุ่มหวาน",y:"A"},
+    {i:"🍦",t:"ไอติมสายรุ้ง ครบทุกรส",y:"F"},
+    {i:"🍵",t:"มัทฉะลาเต้ ขมนิดๆ สงบๆ",y:"D"},
+    {i:"🍫",t:"ดาร์กช็อกโกแลต เข้มลึกมีมิติ",y:"C"}]},
+  {q:"ในกลุ่มเพื่อน คุณคือคนแบบไหน?",opts:[
+    {i:"🤗",t:"คนที่ทุกคนมาขอคำปรึกษา",y:"A"},
+    {i:"😂",t:"ตัวตลกประจำแก๊ง เรียกเสียงฮา",y:"B"},
+    {i:"🗺️",t:"หัวหน้าทริป วางแผนลุยทุกที่",y:"E"},
+    {i:"💡",t:"คนที่โผล่มาพร้อมไอเดียแปลกใหม่",y:"F"}]},
+  {q:"ถ้าย้อนเวลาได้หนึ่งครั้ง จะ...?",opts:[
+    {i:"🫂",t:"กลับไปกอดตัวเองในวันที่เหนื่อย",y:"A"},
+    {i:"🚀",t:"ขอไปดูอนาคตเลยดีกว่า",y:"E"},
+    {i:"⏸️",t:"แค่หยุดเวลาวันสบายๆ ไว้นานๆ",y:"D"},
+    {i:"🎲",t:"ไม่ย้อน! ชีวิตต้องมีเซอร์ไพรส์",y:"B"}]},
+];
+
+let quizIdx=0, quizScores={};
+
+function startQuiz(afterPhoto=false){
+  if(!afterPhoto){ photoScores=null; detColors=[]; } // เล่นควิซเดี่ยว ไม่มีคะแนนจากรูป
+  quizIdx=0;
+  quizScores={A:0,B:0,C:0,D:0,E:0,F:0};
+  show('quiz');
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const item=QUIZ[quizIdx];
+  document.getElementById('quiz-fill').style.width=(quizIdx/QUIZ.length*100)+'%';
+  document.getElementById('quiz-count').textContent=`${quizIdx+1}/${QUIZ.length}`;
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="quiz-num fi">คำถามทายใจ ${quizIdx+1}</div>
+    <div class="quiz-q fi">${item.q}</div>
+    ${item.opts.map((o,i)=>`
+      <div class="quiz-opt fi" style="animation-delay:${i*.06}s" onclick="pickQuiz('${o.y}',this)">
+        <span class="qi">${o.i}</span>${o.t}
+      </div>`).join('')}
+  `;
+}
+
+function pickQuiz(y,el){
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  quizScores[y]++;
+  setTimeout(()=>{
+    quizIdx++;
+    if(quizIdx<QUIZ.length){ renderQuiz(); }
+    else{ finishQuiz(); }
+  },350);
+}
+
+function finishQuiz(){
+  document.getElementById('quiz-fill').style.width='100%';
+  document.getElementById('quiz-count').textContent='✓';
+  const sub=photoScores?'รวมสีจากรูปถ่าย + คำตอบทายใจ 5 ข้อ':'อ่านคำตอบทั้ง 5 ข้อแล้วนะ';
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="quiz-loading fi">
+      <div class="quiz-loading-ring"><div class="quiz-loading-inner">🔮</div></div>
+      <div class="quiz-loading-text">กำลังรวมผลทั้งหมด...</div>
+      <div class="quiz-loading-sub">${sub}</div>
+    </div>`;
+
+  // รวมคะแนน: สีจากรูป (normalize เป็น 0–6) + ควิซ (ข้อละ 1.2)
+  const combined={A:0,B:0,C:0,D:0,E:0,F:0};
+  if(photoScores){
+    const mx=Math.max(...Object.values(photoScores))||1;
+    for(const k in combined) combined[k]+=photoScores[k]/mx*6;
+  }
+  for(const k in combined) combined[k]+=quizScores[k]*1.2;
+  const type=Object.entries(combined).sort((a,b)=>b[1]-a[1])[0][0];
+  const src=photoScores?'camera':'quiz';
+  setTimeout(()=>showResult(type,src),1800);
+}
+
+/* ══════════════════════════════════════
+   RESULT
+══════════════════════════════════════ */
+function showResult(type,source='camera'){
+  const p=P[type];
+  // สุ่ม quote จากคลังของ type นี้
+  const quote=p.quotes[Math.floor(Math.random()*p.quotes.length)];
+  currentType=type; currentQuote=quote;
+  show('result');
+  document.getElementById('rh-type').textContent=p.name+' '+p.emoji;
+
+  const body=document.getElementById('result-body');
+  body.innerHTML=`
+
+    <!-- 1. CHARACTER HERO -->
+    <div class="char-hero fi">
+      <div class="char-bubble">
+        <div class="char-svg-big">${charSVG(type)}</div>
+        ${p.vibes ? `<span class="char-badge badge-tl">${p.vibes[0]}</span>
+        <span class="char-badge badge-tr">${p.vibes[1]}</span>
+        <span class="char-badge badge-bl">${p.vibes[2]}</span>
+        <span class="char-badge badge-br">${p.vibes[3]}</span>` : ''}
+      </div>
+      <div class="char-name-big">${p.name} ${p.emoji}</div>
+      <div class="char-desc-big">${p.desc}</div>
+    </div>
+
+    <!-- 2. QUOTE -->
+    <div class="fi" style="animation-delay:.1s;padding:0 0 0;border-bottom:1px solid #ebebeb;">
+      <div class="quote-pill" style="margin:0 0 0;padding:20px 0 24px;">
+        <div class="sec-label">Your Quote</div>
+        <div class="quote-text">"${quote}"</div>
+        <div class="quote-source">— ${p.name} energy</div>
+      </div>
+    </div>
+
+    <!-- 3. PALETTE -->
+    <div class="palette-section fi" style="animation-delay:.18s;">
+      <div class="sec-label">Color Palette</div>
+      <div class="palette-large">
+        ${p.palette.map((s,i)=>`
+          <div class="pl-swatch fi" style="background:${s.c};animation-delay:${.18+i*.05}s;" title="${s.c}">
+            <span class="pl-swatch-name">${s.n}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- 4. DETECTED (เฉพาะ path ถ่ายรูป) -->
+    ${source==='camera' && detColors.length ? `
+    <div class="detected-section fi" style="animation-delay:.32s;">
+      <div class="sec-label">สีที่ตรวจพบจากรูปของคุณ</div>
+      <div class="detected-row">
+        ${detColors.map(c=>`
+          <div class="det-swatch" style="background:${c};">
+            <div class="det-tooltip">${c}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- 5. INSPO -->
+    <div class="inspo-section fi" style="animation-delay:.38s;border-bottom:1px solid #ebebeb;padding-bottom:24px;">
+      <div class="sec-label">Painting Inspiration</div>
+      <div class="inspo-grid">
+        ${p.inspo.map(ins=>`
+          <div class="inspo-cell" style="background:${ins.bg};">
+            <span>${ins.e}</span>
+            <div class="inspo-lbl">${ins.l}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- 6. PAINT TEMPLATES -->
+    <div class="tpl-section fi" style="animation-delay:.48s;">
+      <div class="sec-label">Paint Templates</div>
+      <div class="tpl-grid" id="tpl-grid"></div>
+      <p class="tpl-hint">กดค้างที่ลายเพื่อ Save • ใช้เป็นเรฟ หรือเทรซก่อน paint ได้เลย 🖌️</p>
+    </div>
+
+    <!-- 7. COMBINATIONS -->
+    <div class="combo-section fi" style="animation-delay:.44s;border-bottom:none;">
+      <div class="sec-label">Color Combinations</div>
+      <div class="combo-row">
+        ${p.combos.map(cm=>`
+          <div class="combo">
+            <div class="combo-swatch" style="background:${cm.a}"></div>
+            <div class="combo-swatch" style="background:${cm.b}"></div>
+            <div class="combo-label">${cm.l}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- SHARE / SAVE CARD -->
+    <div class="share-section fi" style="animation-delay:.5s;">
+      <button class="btn-share" onclick="saveCard()">🖼️  บันทึกการ์ดสรุปลงมือถือ</button>
+      <button class="btn-share btn-share-alt" onclick="doShare()">📤  แชร์ข้อความ</button>
+    </div>
+  `;
+
+  // Render paint templates
+  const tplGrid = document.getElementById('tpl-grid');
+  if(tplGrid){
+    const tpls = paintTemplates(type);
+    tplGrid.innerHTML = tpls.map(t=>`
+      <div class="tpl-cell" title="${t.l}">
+        ${t.svg}
+        <div class="tpl-lbl">${t.l}</div>
+      </div>`).join('');
+  }
+
+  confetti(p.palette.map(s=>s.c));
+}
+
+/* ══════════════════════════════════════
+   PAINT TEMPLATES — line art per type
+══════════════════════════════════════ */
+function paintTemplates(type){
+  const s = 'stroke="#1B3A8C" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  const sd = 'stroke="#1B3A8C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"';
+
+  const T = {
+    A:[
+      { l:"ดอกไม้", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="10" ${s}/>
+          <ellipse cx="50" cy="28" rx="9" ry="14" ${s}/>
+          <ellipse cx="50" cy="72" rx="9" ry="14" ${s}/>
+          <ellipse cx="28" cy="50" rx="14" ry="9" ${s}/>
+          <ellipse cx="72" cy="50" rx="14" ry="9" ${s}/>
+          <ellipse cx="32" cy="32" rx="9" ry="14" transform="rotate(45,32,32)" ${s}/>
+          <ellipse cx="68" cy="32" rx="9" ry="14" transform="rotate(-45,68,32)" ${s}/>
+          <ellipse cx="32" cy="68" rx="9" ry="14" transform="rotate(-45,32,68)" ${s}/>
+          <ellipse cx="68" cy="68" rx="9" ry="14" transform="rotate(45,68,68)" ${s}/>
+        </svg>` },
+      { l:"หัวใจลาย", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,75 C30,58 15,48 15,34 C15,22 28,18 38,26 C42,29 46,33 50,38 C54,33 58,29 62,26 C72,18 85,22 85,34 C85,48 70,58 50,75Z" ${s}/>
+          <path d="M50,62 C38,52 28,45 28,36" ${sd}/>
+          <path d="M50,62 C62,52 72,45 72,36" ${sd}/>
+        </svg>` },
+      { l:"ดอกเชอร์รี่", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="80" x2="50" y2="40" ${s}/>
+          <path d="M50,40 Q35,30 20,35" ${s}/>
+          <path d="M50,40 Q65,30 80,35" ${s}/>
+          <circle cx="20" cy="34" r="8" ${s}/>
+          <circle cx="80" cy="34" r="8" ${s}/>
+          <path d="M16,30 Q20,24 24,30" ${s}/>
+          <path d="M76,30 Q80,24 84,30" ${s}/>
+          <path d="M42,56 Q50,48 58,56 Q50,64 42,56Z" ${s}/>
+        </svg>` },
+      { l:"โบว์น่ารัก", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,50 Q30,30 15,38 Q20,50 15,62 Q30,70 50,50Z" ${s}/>
+          <path d="M50,50 Q70,30 85,38 Q80,50 85,62 Q70,70 50,50Z" ${s}/>
+          <circle cx="50" cy="50" r="6" ${s}/>
+          <path d="M46,46 Q50,40 54,46" ${sd}/>
+          <path d="M46,54 Q50,60 54,54" ${sd}/>
+        </svg>` },
+      { l:"ดอกไม้เล็ก", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="35" r="6" ${s}/><circle cx="30" cy="23" r="5" ${s}/>
+          <circle cx="30" cy="47" r="5" ${s}/><circle cx="19" cy="29" r="5" ${s}/>
+          <circle cx="41" cy="29" r="5" ${s}/><circle cx="30" cy="35" r="3" ${s}/>
+          <circle cx="65" cy="65" r="7" ${s}/><circle cx="65" cy="51" r="6" ${s}/>
+          <circle cx="65" cy="79" r="6" ${s}/><circle cx="51" cy="58" r="6" ${s}/>
+          <circle cx="79" cy="58" r="6" ${s}/><circle cx="65" cy="65" r="4" ${s}/>
+          <line x1="30" y1="41" x2="55" y2="55" ${s}/>
+          <path d="M38,48 Q46,44 52,50" ${sd}/>
+        </svg>` },
+      { l:"ใบไม้กิ่ง", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20,80 Q40,60 50,20" ${s}/>
+          <path d="M50,20 Q65,40 55,55" ${s}/>
+          <path d="M50,35 Q70,30 65,45" ${s}/>
+          <path d="M48,50 Q68,48 60,60" ${s}/>
+          <path d="M45,65 Q62,65 55,75" ${s}/>
+          <path d="M50,20 Q35,38 40,52" ${s}/>
+        </svg>` },
+    ],
+    B:[
+      { l:"ดวงอาทิตย์", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="18" ${s}/>
+          <line x1="50" y1="10" x2="50" y2="22" ${s}/>
+          <line x1="50" y1="78" x2="50" y2="90" ${s}/>
+          <line x1="10" y1="50" x2="22" y2="50" ${s}/>
+          <line x1="78" y1="50" x2="90" y2="50" ${s}/>
+          <line x1="22" y1="22" x2="31" y2="31" ${s}/>
+          <line x1="69" y1="69" x2="78" y2="78" ${s}/>
+          <line x1="78" y1="22" x2="69" y2="31" ${s}/>
+          <line x1="22" y1="78" x2="31" y2="69" ${s}/>
+        </svg>` },
+      { l:"คลื่นทะเล", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,35 Q22,25 35,35 Q48,45 60,35 Q72,25 90,35" ${s}/>
+          <path d="M10,50 Q22,40 35,50 Q48,60 60,50 Q72,40 90,50" ${s}/>
+          <path d="M10,65 Q22,55 35,65 Q48,75 60,65 Q72,55 90,65" ${s}/>
+          <circle cx="75" cy="25" r="8" ${s}/>
+          <line x1="75" y1="10" x2="75" y2="17" ${s}/>
+        </svg>` },
+      { l:"สับปะรด", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="62" rx="22" ry="28" ${s}/>
+          <line x1="50" y1="34" x2="50" y2="15" ${s}/>
+          <path d="M50,15 Q38,22 36,30" ${s}/>
+          <path d="M50,15 Q62,22 64,30" ${s}/>
+          <path d="M50,15 Q44,28 50,34" ${s}/>
+          <path d="M50,15 Q56,28 50,34" ${s}/>
+          <line x1="34" y1="48" x2="66" y2="48" ${sd}/>
+          <line x1="32" y1="58" x2="68" y2="58" ${sd}/>
+          <line x1="34" y1="68" x2="66" y2="68" ${sd}/>
+          <line x1="42" y1="38" x2="42" y2="88" ${sd}/>
+          <line x1="50" y1="36" x2="50" y2="90" ${sd}/>
+          <line x1="58" y1="38" x2="58" y2="88" ${sd}/>
+        </svg>` },
+      { l:"ดาว Burst", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,10 L55,38 L82,28 L63,48 L90,55 L62,58 L72,85 L50,67 L28,85 L38,58 L10,55 L37,48 L18,28 L45,38 Z" ${s}/>
+          <circle cx="50" cy="50" r="10" ${s}/>
+        </svg>` },
+      { l:"แตงโม", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15,70 Q50,10 85,70 Z" ${s}/>
+          <path d="M22,70 Q50,20 78,70" ${sd}/>
+          <line x1="50" y1="14" x2="50" y2="70" ${sd}/>
+          <line x1="35" y1="18" x2="26" y2="70" ${sd}/>
+          <line x1="65" y1="18" x2="74" y2="70" ${sd}/>
+          <circle cx="38" cy="55" r="2.5" ${s}/>
+          <circle cx="50" cy="48" r="2.5" ${s}/>
+          <circle cx="62" cy="55" r="2.5" ${s}/>
+          <circle cx="44" cy="62" r="2.5" ${s}/>
+          <circle cx="56" cy="62" r="2.5" ${s}/>
+        </svg>` },
+      { l:"ไอศกรีม", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M35,52 L50,88 L65,52" ${s}/>
+          <path d="M30,30 Q30,10 50,10 Q70,10 70,30 Q70,52 50,52 Q30,52 30,30Z" ${s}/>
+          <path d="M30,40 Q50,55 70,40" ${sd}/>
+          <path d="M32,30 Q50,42 68,30" ${sd}/>
+          <circle cx="50" cy="20" r="0" ${s}/>
+          <path d="M44,16 Q50,10 56,16" ${s}/>
+        </svg>` },
+    ],
+    C:[
+      { l:"พระจันทร์", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M55,15 Q35,20 28,40 Q20,62 38,76 Q55,88 72,78 Q55,72 50,55 Q44,36 55,15Z" ${s}/>
+          <circle cx="72" cy="25" r="3" ${s}/>
+          <circle cx="82" cy="45" r="2" ${s}/>
+          <circle cx="20" cy="55" r="2.5" ${s}/>
+          <path d="M62,18 L65,14 L68,18 L72,16 L70,20 L74,22 L70,23 L70,28 L67,24 L63,26 L65,22 Z" ${s}/>
+          <path d="M20,30 L22,26 L24,30 L28,28 L26,32 L30,34 L26,35 L26,39 L23,36 L20,37 L22,33 Z" ${s}/>
+        </svg>` },
+      { l:"คริสตัล", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,10 L62,35 L85,30 L70,50 L85,70 L60,65 L50,90 L40,65 L15,70 L30,50 L15,30 L38,35 Z" ${s}/>
+          <line x1="50" y1="10" x2="50" y2="90" ${sd}/>
+          <line x1="15" y1="30" x2="85" y2="70" ${sd}/>
+          <line x1="15" y1="70" x2="85" y2="30" ${sd}/>
+        </svg>` },
+      { l:"แมวดำ", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="65" rx="26" ry="20" ${s}/>
+          <circle cx="50" cy="40" r="18" ${s}/>
+          <path d="M32,28 L24,14 L36,24" ${s}/>
+          <path d="M68,28 L76,14 L64,24" ${s}/>
+          <ellipse cx="44" cy="38" rx="4" ry="5" ${s}/>
+          <ellipse cx="56" cy="38" rx="4" ry="5" ${s}/>
+          <path d="M44,46 Q50,50 56,46" ${s}/>
+          <line x1="34" y1="44" x2="20" y2="40" ${s}/>
+          <line x1="34" y1="47" x2="20" y2="47" ${s}/>
+          <line x1="66" y1="44" x2="80" y2="40" ${s}/>
+          <line x1="66" y1="47" x2="80" y2="47" ${s}/>
+          <path d="M36,65 L30,85" ${s}/><path d="M64,65 L70,85" ${s}/>
+        </svg>` },
+      { l:"ดาวกระจาย", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,20 L52,28 L60,28 L54,33 L56,41 L50,36 L44,41 L46,33 L40,28 L48,28 Z" ${s}/>
+          <path d="M22,50 L23,55 L28,55 L24,58 L25,63 L22,60 L19,63 L20,58 L16,55 L21,55 Z" ${s}/>
+          <path d="M72,65 L73,69 L77,69 L74,72 L75,76 L72,73 L69,76 L70,72 L67,69 L71,69 Z" ${s}/>
+          <circle cx="78" cy="30" r="3" ${s}/>
+          <circle cx="25" cy="78" r="2" ${s}/>
+          <circle cx="85" cy="72" r="2" ${s}/>
+          <line x1="50" y1="5" x2="50" y2="12" ${s}/>
+          <line x1="50" y1="95" x2="50" y2="88" ${s}/>
+          <line x1="5" y1="50" x2="12" y2="50" ${s}/>
+          <line x1="95" y1="50" x2="88" y2="50" ${s}/>
+        </svg>` },
+      { l:"ตาสาม", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,18 L88,78 L12,78 Z" ${s}/>
+          <ellipse cx="50" cy="60" rx="14" ry="18" ${s}/>
+          <circle cx="50" cy="60" r="7" ${s}/>
+          <circle cx="50" cy="60" r="2" ${s}/>
+          <line x1="50" y1="18" x2="50" y2="42" ${sd}/>
+          <path d="M30,54 Q50,48 70,54" ${sd}/>
+        </svg>` },
+      { l:"ซุ้มดาว", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20,85 Q20,30 50,20 Q80,30 80,85" ${s}/>
+          <circle cx="50" cy="38" r="8" ${s}/>
+          <path d="M50,30 L52,36 L58,36 L53,40 L55,46 L50,42 L45,46 L47,40 L42,36 L48,36 Z" ${s}/>
+          <circle cx="30" cy="55" r="4" ${s}/>
+          <circle cx="70" cy="55" r="4" ${s}/>
+          <circle cx="25" cy="70" r="3" ${s}/>
+          <circle cx="75" cy="70" r="3" ${s}/>
+        </svg>` },
+    ],
+    D:[
+      { l:"ใบไม้ Boho", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,85 L50,20" ${s}/>
+          <path d="M50,40 Q28,30 22,48 Q28,58 50,50" ${s}/>
+          <path d="M50,55 Q72,44 78,62 Q72,72 50,64" ${s}/>
+          <path d="M50,25 Q34,18 30,30" ${s}/>
+          <path d="M50,70 Q66,80 68,70" ${s}/>
+          <line x1="36" y1="42" x2="50" y2="46" ${sd}/>
+          <line x1="32" y1="50" x2="50" y2="52" ${sd}/>
+          <line x1="64" y1="58" x2="50" y2="60" ${sd}/>
+          <line x1="68" y1="66" x2="50" y2="65" ${sd}/>
+        </svg>` },
+      { l:"เห็ด", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M38,55 L35,82 L65,82 L62,55" ${s}/>
+          <path d="M42,60 Q50,65 58,60" ${sd}/>
+          <path d="M40,70 Q50,75 60,70" ${sd}/>
+          <path d="M20,55 Q20,20 50,18 Q80,20 80,55 Z" ${s}/>
+          <circle cx="40" cy="35" r="6" ${s}/>
+          <circle cx="58" cy="28" r="5" ${s}/>
+          <circle cx="65" cy="42" r="4" ${s}/>
+          <circle cx="32" cy="45" r="4" ${s}/>
+        </svg>` },
+      { l:"ต้นไม้", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="88" x2="50" y2="55" ${s}/>
+          <line x1="50" y1="72" x2="35" y2="62" ${s}/>
+          <line x1="50" y1="65" x2="65" y2="55" ${s}/>
+          <circle cx="50" cy="40" r="22" ${s}/>
+          <circle cx="34" cy="50" r="14" ${s}/>
+          <circle cx="66" cy="50" r="14" ${s}/>
+          <circle cx="50" cy="28" r="14" ${s}/>
+        </svg>` },
+      { l:"แมลงปอ", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="50" rx="4" ry="28" ${s}/>
+          <ellipse cx="50" cy="38" rx="26" ry="12" transform="rotate(-15,50,38)" ${s}/>
+          <ellipse cx="50" cy="38" rx="26" ry="12" transform="rotate(15,50,38)" ${s}/>
+          <ellipse cx="50" cy="58" rx="20" ry="9" transform="rotate(-10,50,58)" ${s}/>
+          <ellipse cx="50" cy="58" rx="20" ry="9" transform="rotate(10,50,58)" ${s}/>
+          <circle cx="50" cy="24" r="5" ${s}/>
+          <line x1="47" y1="22" x2="42" y2="15" ${s}/>
+          <line x1="53" y1="22" x2="58" y2="15" ${s}/>
+        </svg>` },
+      { l:"กระถางต้นไม้", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32,55 L36,85 L64,85 L68,55 Z" ${s}/>
+          <line x1="30" y1="55" x2="70" y2="55" ${s}/>
+          <line x1="50" y1="55" x2="50" y2="30" ${s}/>
+          <path d="M50,30 Q30,22 25,38 Q32,48 50,42" ${s}/>
+          <path d="M50,30 Q70,22 75,38 Q68,48 50,42" ${s}/>
+          <path d="M50,18 Q42,12 38,22" ${s}/>
+          <path d="M50,18 Q58,12 62,22" ${s}/>
+          <line x1="36" y1="65" x2="64" y2="65" ${sd}/>
+          <line x1="37" y1="73" x2="63" y2="73" ${sd}/>
+        </svg>` },
+      { l:"รังผึ้ง", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,18 L62,25 L62,39 L50,46 L38,39 L38,25 Z" ${s}/>
+          <path d="M62,25 L74,18 L86,25 L86,39 L74,46 L62,39" ${s}/>
+          <path d="M38,25 L26,18 L14,25 L14,39 L26,46 L38,39" ${s}/>
+          <path d="M62,39 L74,46 L74,60 L62,67 L50,60 L50,46" ${s}/>
+          <path d="M38,39 L26,46 L26,60 L38,67 L50,60 L50,46" ${s}/>
+          <path d="M50,60 L62,67 L62,81 L50,88 L38,81 L38,67 Z" ${s}/>
+        </svg>` },
+    ],
+    E:[
+      { l:"เปลวไฟ", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,88 Q25,70 28,50 Q30,36 40,30 Q35,45 45,48 Q38,30 50,12 Q55,28 52,38 Q62,28 60,44 Q70,36 68,52 Q75,42 72,58 Q76,72 50,88Z" ${s}/>
+          <path d="M50,75 Q38,65 40,55 Q44,62 50,60 Q45,52 50,42 Q54,52 56,58 Q60,52 58,62 Q62,68 50,75Z" ${sd}/>
+        </svg>` },
+      { l:"สายฟ้า", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M58,10 L35,52 L52,52 L42,90 L75,42 L56,42 Z" ${s}/>
+          <path d="M20,25 L14,38 L22,38 L18,50" ${s}/>
+          <path d="M80,50 L74,63 L82,63 L78,75" ${s}/>
+        </svg>` },
+      { l:"มงกุฎ", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12,72 L12,38 L30,55 L50,20 L70,55 L88,38 L88,72 Z" ${s}/>
+          <line x1="12" y1="80" x2="88" y2="80" ${s}/>
+          <circle cx="50" cy="20" r="6" ${s}/>
+          <circle cx="12" cy="38" r="5" ${s}/>
+          <circle cx="88" cy="38" r="5" ${s}/>
+          <line x1="24" y1="72" x2="24" y2="80" ${s}/>
+          <line x1="37" y1="72" x2="37" y2="80" ${s}/>
+          <line x1="50" y1="72" x2="50" y2="80" ${s}/>
+          <line x1="63" y1="72" x2="63" y2="80" ${s}/>
+          <line x1="76" y1="72" x2="76" y2="80" ${s}/>
+        </svg>` },
+      { l:"เสือ Roar", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="48" r="28" ${s}/>
+          <path d="M32,30 L26,18 L36,26" ${s}/>
+          <path d="M68,30 L74,18 L64,26" ${s}/>
+          <ellipse cx="42" cy="44" rx="5" ry="6" ${s}/>
+          <ellipse cx="58" cy="44" rx="5" ry="6" ${s}/>
+          <path d="M44,56 L50,60 L56,56" ${s}/>
+          <path d="M42,62 Q50,70 58,62" ${s}/>
+          <line x1="30" y1="52" x2="18" y2="48" ${s}/><line x1="30" y1="56" x2="18" y2="56" ${s}/>
+          <line x1="70" y1="52" x2="82" y2="48" ${s}/><line x1="70" y1="56" x2="82" y2="56" ${s}/>
+          <path d="M35,38 Q50,32 65,38" ${sd}/>
+        </svg>` },
+      { l:"ดาวแหลม", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,8 L56,42 L90,40 L62,58 L74,92 L50,70 L26,92 L38,58 L10,40 L44,42 Z" ${s}/>
+          <circle cx="50" cy="50" r="12" ${s}/>
+          <line x1="50" y1="38" x2="50" y2="62" ${sd}/>
+          <line x1="38" y1="50" x2="62" y2="50" ${sd}/>
+        </svg>` },
+      { l:"คลื่นพลัง", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="8" ${s}/>
+          <path d="M34,34 Q16,50 34,66" ${s}/>
+          <path d="M66,34 Q84,50 66,66" ${s}/>
+          <path d="M26,26 Q2,50 26,74" ${s}/>
+          <path d="M74,26 Q98,50 74,74" ${s}/>
+          <line x1="50" y1="8" x2="50" y2="20" ${s}/>
+          <line x1="50" y1="80" x2="50" y2="92" ${s}/>
+        </svg>` },
+    ],
+    F:[
+      { l:"สายรุ้ง", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,72 Q10,28 50,28 Q90,28 90,72" ${s}/>
+          <path d="M18,72 Q18,36 50,36 Q82,36 82,72" ${s}/>
+          <path d="M26,72 Q26,44 50,44 Q74,44 74,72" ${s}/>
+          <path d="M34,72 Q34,52 50,52 Q66,52 66,72" ${s}/>
+          <circle cx="22" cy="78" r="6" ${s}/>
+          <circle cx="78" cy="78" r="6" ${s}/>
+        </svg>` },
+      { l:"ยูนิคอร์น", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20,75 Q15,55 25,45 Q35,35 50,38 Q68,38 75,52 Q82,66 72,75 Q62,85 50,85 Q35,85 20,75Z" ${s}/>
+          <path d="M68,38 L78,15" ${s}/>
+          <path d="M68,38 L60,20 L78,15" ${s}/>
+          <circle cx="42" cy="54" r="4" ${s}/>
+          <circle cx="58" cy="54" r="4" ${s}/>
+          <path d="M44,65 Q50,70 56,65" ${s}/>
+          <path d="M25,42 Q22,30 30,28" ${s}/>
+          <path d="M32,55 Q24,50 20,56" ${s}/>
+          <path d="M55,38 Q56,28 65,30 Q58,36 55,38Z" ${s}/>
+          <path d="M50,85 L42,95 M50,85 L58,95" ${s}/>
+          <path d="M30,80 L26,92 M72,80 L76,92" ${s}/>
+        </svg>` },
+      { l:"กล้วยไม้", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="90" x2="50" y2="25" ${s}/>
+          <ellipse cx="35" cy="40" rx="14" ry="9" transform="rotate(30,35,40)" ${s}/>
+          <ellipse cx="65" cy="40" rx="14" ry="9" transform="rotate(-30,65,40)" ${s}/>
+          <ellipse cx="30" cy="58" rx="12" ry="8" transform="rotate(20,30,58)" ${s}/>
+          <ellipse cx="70" cy="58" rx="12" ry="8" transform="rotate(-20,70,58)" ${s}/>
+          <ellipse cx="50" cy="28" rx="10" ry="14" ${s}/>
+          <circle cx="50" cy="38" r="5" ${s}/>
+          <path d="M46,36 Q50,32 54,36" ${s}/>
+        </svg>` },
+      { l:"ผีเสื้อ", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="50" rx="3" ry="28" ${s}/>
+          <path d="M47,38 Q28,18 18,28 Q10,40 22,52 Q34,62 47,52" ${s}/>
+          <path d="M53,38 Q72,18 82,28 Q90,40 78,52 Q66,62 53,52" ${s}/>
+          <path d="M47,56 Q30,62 24,75 Q34,80 47,66" ${s}/>
+          <path d="M53,56 Q70,62 76,75 Q66,80 53,66" ${s}/>
+          <circle cx="50" cy="24" r="4" ${s}/>
+          <line x1="47" y1="21" x2="38" y2="12" ${s}/>
+          <line x1="53" y1="21" x2="62" y2="12" ${s}/>
+        </svg>` },
+      { l:"เมฆ & ฝน", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22,52 Q18,38 28,34 Q30,22 42,22 Q48,16 56,20 Q66,18 70,28 Q80,28 80,40 Q84,52 72,54 Z" ${s}/>
+          <line x1="34" y1="62" x2="28" y2="76" ${s}/>
+          <line x1="42" y1="62" x2="36" y2="76" ${s}/>
+          <line x1="50" y1="62" x2="44" y2="76" ${s}/>
+          <line x1="58" y1="62" x2="52" y2="76" ${s}/>
+          <line x1="66" y1="62" x2="60" y2="76" ${s}/>
+          <line x1="40" y1="80" x2="34" y2="94" ${s}/>
+          <line x1="52" y1="80" x2="46" y2="94" ${s}/>
+          <line x1="64" y1="80" x2="58" y2="94" ${s}/>
+        </svg>` },
+      { l:"ดาวดวงใหญ่", svg:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,12 L57,36 L82,36 L62,52 L69,76 L50,62 L31,76 L38,52 L18,36 L43,36 Z" ${s}/>
+          <path d="M50,22 L55,38 L72,38 L58,48 L63,64 L50,54 L37,64 L42,48 L28,38 L45,38 Z" ${sd}/>
+          <circle cx="50" cy="44" r="6" ${s}/>
+        </svg>` },
+    ],
+  };
+  return T[type] || T.F;
+}
+
+function doShare(){
+  const p=P[currentType];
+  const txt=`🎨 Bag Paint Palette: ${p.name} ${p.emoji}\n"${currentQuote}"\n\nColors: ${p.palette.map(s=>s.n).join(' · ')}`;
+  if(navigator.share) navigator.share({title:'Bag Paint Studio',text:txt}).catch(()=>{});
+  else navigator.clipboard.writeText(txt).then(()=>alert('คัดลอก Palette แล้ว! 🎨'));
+}
+
+/* ══════════════════════════════════════
+   SUMMARY CARD — สร้างการ์ดสรุปเป็นรูป save ลงมือถือ
+══════════════════════════════════════ */
+function svgToImage(svg,size){
+  return new Promise((res,rej)=>{
+    const s=svg.replace('<svg ',`<svg width="${size}" height="${size}" `);
+    const url=URL.createObjectURL(new Blob([s],{type:'image/svg+xml;charset=utf-8'}));
+    const img=new Image();
+    img.onload=()=>{URL.revokeObjectURL(url);res(img);};
+    img.onerror=e=>{URL.revokeObjectURL(url);rej(e);};
+    img.src=url;
+  });
+}
+
+function rr(x,a,b,w,h,r){
+  x.beginPath();
+  if(x.roundRect){ x.roundRect(a,b,w,h,r); }
+  else{
+    x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);
+    x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();
+  }
+}
+
+function wrapLines(ctx,text,maxW){
+  const words=text.split(' ');
+  const lines=[]; let line='';
+  for(const w of words){
+    const t=line?line+' '+w:w;
+    if(ctx.measureText(t).width>maxW && line){ lines.push(line); line=w; }
+    else line=t;
+  }
+  if(line)lines.push(line);
+  return lines;
+}
+
+async function makeResultCard(){
+  await document.fonts.ready;
+  const p=P[currentType];
+  const W=1080,H=1620;
+  const RB=['#E8292A','#F5871F','#F5C800','#3AAA35','#2266CC','#8833BB'];
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const x=cv.getContext('2d');
+
+  // พื้นครีม + แถบรุ้งบน-ล่าง
+  x.fillStyle='#FAF8F3'; x.fillRect(0,0,W,H);
+  RB.forEach((c,i)=>{
+    x.fillStyle=c;
+    x.fillRect(i*W/6,0,W/6+1,16);
+    x.fillRect(i*W/6,H-16,W/6+1,16);
+  });
+
+  x.textAlign='center';
+  x.fillStyle='#9A96A0'; x.font='600 28px Kanit, sans-serif';
+  x.fillText('AI PRIDE × BAG PAINT STUDIO', W/2, 82);
+
+  // ตัวการ์ตูน
+  try{
+    const img=await svgToImage(charSVG(currentType),380);
+    x.drawImage(img, W/2-190, 105, 380, 380);
+  }catch(e){ /* วาดต่อแม้ character ไม่ขึ้น */ }
+
+  // ชื่อ type + คำอธิบาย
+  x.fillStyle='#1B3A8C'; x.font='700 76px Kanit, sans-serif';
+  x.fillText(p.name+' '+p.emoji, W/2, 572);
+  x.fillStyle='#8a8690'; x.font='300 36px Kanit, sans-serif';
+  x.fillText(p.desc, W/2, 632);
+
+  // กล่อง Quote
+  const qx=80,qy=680,qw=W-160,qh=230;
+  x.fillStyle='#FFFFFF';
+  rr(x,qx,qy,qw,qh,24); x.fill();
+  const grad=x.createLinearGradient(0,qy,0,qy+qh);
+  RB.forEach((c,i)=>grad.addColorStop(i/5,c));
+  x.fillStyle=grad;
+  rr(x,qx,qy,10,qh,5); x.fill();
+
+  x.fillStyle='#1B3A8C'; x.font='italic 600 40px Kanit, sans-serif';
+  const lines=wrapLines(x,'"'+currentQuote+'"',qw-120);
+  const lh=56, ty=qy+qh/2-(lines.length-1)*lh/2-12;
+  lines.forEach((l,i)=>x.fillText(l,W/2,ty+i*lh));
+  x.fillStyle='#9A96A0'; x.font='300 26px Kanit, sans-serif';
+  x.fillText('— '+p.name+' energy', W/2, qy+qh-28);
+
+  // Palette
+  x.fillStyle='#1B3A8C'; x.font='600 28px Kanit, sans-serif';
+  x.fillText('YOUR COLOR PALETTE', W/2, 990);
+  const sw=140,gap=16,total=6*sw+5*gap,sx=(W-total)/2,sy=1020;
+  p.palette.forEach((s,i)=>{
+    x.fillStyle=s.c;
+    rr(x,sx+i*(sw+gap),sy,sw,sw,20); x.fill();
+    x.fillStyle='#5a5a66'; x.font='400 22px Kanit, sans-serif';
+    x.fillText(s.n, sx+i*(sw+gap)+sw/2, sy+sw+34);
+  });
+
+  // Vibes
+  x.fillStyle='#1B3A8C'; x.font='500 30px Kanit, sans-serif';
+  x.fillText(p.vibes.join('   '), W/2, 1250);
+
+  // Paint Templates — ลายเส้นสำหรับ paint ตาม type
+  x.fillStyle='#1B3A8C'; x.font='600 28px Kanit, sans-serif';
+  x.fillText('PAINT TEMPLATES', W/2, 1330);
+  const tpls=paintTemplates(currentType);
+  const tw=150, tgap=14, ttotal=6*tw+5*tgap, tx0=(W-ttotal)/2, ty0=1360;
+  const tplImgs=await Promise.all(tpls.map(t=>svgToImage(t.svg,tw).catch(()=>null)));
+  tpls.forEach((t,i)=>{
+    const cx0=tx0+i*(tw+tgap);
+    x.fillStyle='#FFFFFF';
+    rr(x,cx0,ty0,tw,tw,18); x.fill();
+    x.strokeStyle='#EDE9E0'; x.lineWidth=2;
+    rr(x,cx0,ty0,tw,tw,18); x.stroke();
+    if(tplImgs[i]) x.drawImage(tplImgs[i], cx0+14, ty0+14, tw-28, tw-28);
+    x.fillStyle='#5a5a66'; x.font='400 22px Kanit, sans-serif';
+    x.fillText(t.l, cx0+tw/2, ty0+tw+32);
+  });
+
+  return cv;
+}
+
+async function saveCard(){
+  const cv=await makeResultCard();
+  const url=cv.toDataURL('image/png');
+  showCardModal(url,cv);
+}
+
+function showCardModal(url,cv){
+  document.getElementById('card-modal')?.remove();
+  const m=document.createElement('div');
+  m.id='card-modal';
+  m.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(10,10,20,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;';
+  m.innerHTML=`
+    <img src="${url}" alt="card" style="max-width:min(400px,88vw);max-height:66vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+    <div style="color:#fff;font-size:.85rem;font-family:Kanit,sans-serif;opacity:.85;">📱 กดค้างที่รูปเพื่อบันทึกลงมือถือ</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button id="card-share" style="background:#fff;color:#1B3A8C;border:none;padding:12px 22px;border-radius:10px;font-weight:600;font-family:Kanit,sans-serif;font-size:.9rem;cursor:pointer;">📤 แชร์ / บันทึก</button>
+      <a href="${url}" download="bag-vibe-card.png" style="background:transparent;border:1.5px solid rgba(255,255,255,.45);color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-family:Kanit,sans-serif;font-size:.9rem;">⬇️ ดาวน์โหลด</a>
+      <button id="card-close" style="background:transparent;border:1.5px solid rgba(255,255,255,.45);color:#fff;padding:12px 22px;border-radius:10px;font-family:Kanit,sans-serif;font-size:.9rem;cursor:pointer;">ปิด</button>
+    </div>`;
+  document.body.appendChild(m);
+  document.getElementById('card-close').onclick=()=>m.remove();
+  document.getElementById('card-share').onclick=()=>{
+    cv.toBlob(async b=>{
+      const f=new File([b],'bag-vibe-card.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[f]})){
+        try{ await navigator.share({files:[f],title:'Bag Paint Studio'}); }catch(e){}
+      }else{
+        alert('เบราว์เซอร์นี้ไม่รองรับการแชร์รูป — กดค้างที่รูป หรือกดดาวน์โหลดแทนนะ');
+      }
+    },'image/png');
+  };
+}
+
+function confetti(colors){
+  for(let i=0;i<50;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='cfp';
+      el.style.left=Math.random()*100+'vw';
+      el.style.background=colors[Math.floor(Math.random()*colors.length)];
+      const sz=Math.random()*8+5;
+      el.style.cssText+=`width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*2+1.2}s;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),3200);
+    },i*40);
+  }
+}
+
+/* ══════════════════════════════════════
+   PWA — Service Worker + Install prompt
+══════════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW register failed:',err));
+  });
+}
+
+/* Android/Chrome install banner */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredInstall=e;
+  showInstallHint();
+});
+
+function showInstallHint(){
+  if(document.getElementById('install-hint'))return;
+  const bar=document.createElement('div');
+  bar.id='install-hint';
+  bar.style.cssText='position:fixed;bottom:16px;left:16px;right:16px;z-index:500;background:#1B3A8C;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 24px rgba(27,58,140,.35);font-family:Inter,Kanit,sans-serif;font-size:.85rem;';
+  bar.innerHTML=`
+    <span>📲 ติดตั้งแอปไว้ที่หน้าจอ ใช้งานง่ายกว่า!</span>
+    <span style="display:flex;gap:8px;flex-shrink:0;">
+      <button id="install-yes" style="background:#fff;color:#1B3A8C;border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:.8rem;cursor:pointer;font-family:inherit;">ติดตั้ง</button>
+      <button id="install-no" style="background:transparent;color:rgba(255,255,255,.7);border:none;font-size:.8rem;cursor:pointer;font-family:inherit;">ไว้ก่อน</button>
+    </span>`;
+  document.body.appendChild(bar);
+  document.getElementById('install-yes').onclick=async()=>{
+    bar.remove();
+    if(deferredInstall){ deferredInstall.prompt(); deferredInstall=null; }
+  };
+  document.getElementById('install-no').onclick=()=>bar.remove();
+}
+</script>
+</body>
+</html>
